@@ -1,14 +1,19 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")
+    id("org.jetbrains.kotlin.android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
+dependencies {
+    implementation("com.google.firebase:firebase-analytics:21.5.0") // OK
+    implementation("com.google.firebase:firebase-auth:22.3.1")    // If you are using Firebase Authentication
+}
 android {
     namespace = "com.example.group_project"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "26.3.11579264"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -24,7 +29,7 @@ android {
         applicationId = "com.example.group_project"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -42,3 +47,4 @@ android {
 flutter {
     source = "../.."
 }
+

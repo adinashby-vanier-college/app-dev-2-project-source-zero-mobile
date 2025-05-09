@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // ✅ Firebase import
 import '../routes.dart';
 
 class SignUpScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // ✅ Form key for validation
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -28,11 +30,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
-  void _signUp() async {
+  Future<void> _signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isLoading = false);
-    if (mounted) Navigator.pushReplacementNamed(context, Routes.home);
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, Routes.home);
+      }
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Signup failed')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -50,19 +66,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const SizedBox(height: 10),
-              _buildHeader(context),
-              const SizedBox(height: 30),
-              _buildSignUpForm(context),
-              const SizedBox(height: 30),
-              _buildTermsText(),
-              const SizedBox(height: 40),
-              _buildLoginPrompt(context),
-              const SizedBox(height: 20),
-            ],
+          child: Form(
+            key: _formKey, // ✅ wrap with Form
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 10),
+                _buildHeader(context),
+                const SizedBox(height: 30),
+                _buildSignUpForm(context),
+                const SizedBox(height: 30),
+                _buildTermsText(),
+                const SizedBox(height: 40),
+                _buildLoginPrompt(context),
+                const SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       ),
@@ -75,14 +94,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              FontAwesomeIcons.leaf,
-              size: 18,
-              color: Theme.of(context).primaryColor.withOpacity(0.7),
-            ),
+            Icon(FontAwesomeIcons.leaf, size: 18, color: Theme.of(context).primaryColor.withOpacity(0.7)),
             const SizedBox(width: 8),
-            Text(
-              'JOIN OUR COMMUNITY',
+            Text('JOIN OUR COMMUNITY',
               style: GoogleFonts.lato(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -91,16 +105,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
             ),
             const SizedBox(width: 8),
-            Icon(
-              FontAwesomeIcons.leaf,
-              size: 18,
-              color: Theme.of(context).primaryColor.withOpacity(0.7),
-            ),
+            Icon(FontAwesomeIcons.leaf, size: 18, color: Theme.of(context).primaryColor.withOpacity(0.7)),
           ],
         ),
         const SizedBox(height: 20),
-        Text(
-          'Create Account',
+        Text('Create Account',
           style: GoogleFonts.playfairDisplay(
             fontSize: 32,
             fontWeight: FontWeight.bold,
@@ -108,8 +117,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          'Start your zero-waste journey with us',
+        Text('Start your zero-waste journey with us',
           style: GoogleFonts.lato(
             fontSize: 16,
             color: const Color(0xFF2E5D32).withOpacity(0.8),
@@ -126,82 +134,63 @@ class _SignUpScreenState extends State<SignUpScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.05), spreadRadius: 1, blurRadius: 10, offset: const Offset(0, 5)),
         ],
-        border: Border.all(
-          color: const Color(0xFF2E5D32).withOpacity(0.1),
-          width: 1,
-        ),
+        border: Border.all(color: const Color(0xFF2E5D32).withOpacity(0.1), width: 1),
       ),
       child: Column(
         children: [
-          TextField(
+          TextFormField(
             controller: _usernameController,
             decoration: InputDecoration(
               hintText: 'Username',
-              prefixIcon: Icon(
-                Icons.person_outline,
-                color: Theme.of(context).primaryColor,
-              ),
+              prefixIcon: Icon(Icons.person_outline, color: Theme.of(context).primaryColor),
             ),
+            validator: (value) => value == null || value.isEmpty ? 'Please enter a username' : null,
           ),
           const SizedBox(height: 20),
-          TextField(
+          TextFormField(
             controller: _emailController,
             decoration: InputDecoration(
               hintText: 'Email',
-              prefixIcon: Icon(
-                Icons.email_outlined,
-                color: Theme.of(context).primaryColor,
-              ),
+              prefixIcon: Icon(Icons.email_outlined, color: Theme.of(context).primaryColor),
             ),
+            keyboardType: TextInputType.emailAddress,
+            validator: (value) => value == null || !value.contains('@') ? 'Enter a valid email' : null,
           ),
           const SizedBox(height: 20),
-          TextField(
+          TextFormField(
             controller: _passwordController,
             obscureText: _obscurePassword,
             decoration: InputDecoration(
               hintText: 'Password',
-              prefixIcon: Icon(
-                Icons.lock_outline,
-                color: Theme.of(context).primaryColor,
-              ),
+              prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).primaryColor),
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscurePassword ? Icons.visibility_off : Icons.visibility,
                   color: Theme.of(context).primaryColor.withOpacity(0.7),
                 ),
-                onPressed: () {
-                  setState(() => _obscurePassword = !_obscurePassword);
-                },
+                onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
               ),
             ),
+            validator: (value) => value != null && value.length < 6 ? 'Password must be at least 6 characters' : null,
           ),
           const SizedBox(height: 20),
-          TextField(
+          TextFormField(
             controller: _confirmPasswordController,
             obscureText: _obscureConfirmPassword,
             decoration: InputDecoration(
               hintText: 'Confirm Password',
-              prefixIcon: Icon(
-                Icons.lock_outline,
-                color: Theme.of(context).primaryColor,
-              ),
+              prefixIcon: Icon(Icons.lock_outline, color: Theme.of(context).primaryColor),
               suffixIcon: IconButton(
                 icon: Icon(
                   _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
                   color: Theme.of(context).primaryColor.withOpacity(0.7),
                 ),
-                onPressed: () {
-                  setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
-                },
+                onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
               ),
             ),
+            validator: (value) => value != _passwordController.text ? 'Passwords do not match' : null,
           ),
           const SizedBox(height: 30),
           ElevatedButton(
@@ -215,18 +204,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ? const SizedBox(
               height: 24,
               width: 24,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
+              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
             )
-                : Text(
-              'SIGN UP',
-              style: GoogleFonts.lato(
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1.5,
-              ),
-            ),
+                : Text('SIGN UP',
+                style: GoogleFonts.lato(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.5,
+                )),
           ),
         ],
       ),
@@ -238,10 +222,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Text(
         'By signing up, you agree to our Terms of Service and Privacy Policy',
-        style: GoogleFonts.lato(
-          fontSize: 12,
-          color: const Color(0xFF2E5D32).withOpacity(0.6),
-        ),
+        style: GoogleFonts.lato(fontSize: 12, color: const Color(0xFF2E5D32).withOpacity(0.6)),
         textAlign: TextAlign.center,
       ),
     );
@@ -251,23 +232,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text(
-          "Already have an account? ",
-          style: GoogleFonts.lato(
-            color: const Color(0xFF2E5D32).withOpacity(0.8),
-          ),
-        ),
+        Text("Already have an account? ",
+            style: GoogleFonts.lato(color: const Color(0xFF2E5D32).withOpacity(0.8))),
         GestureDetector(
-          onTap: () {
-            Navigator.pushReplacementNamed(context, Routes.login);
-          },
-          child: Text(
-            'Log In',
-            style: GoogleFonts.lato(
-              color: const Color(0xFF2E5D32),
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          onTap: () => Navigator.pushReplacementNamed(context, Routes.login),
+          child: Text('Log In',
+              style: GoogleFonts.lato(color: const Color(0xFF2E5D32), fontWeight: FontWeight.bold)),
         ),
       ],
     );

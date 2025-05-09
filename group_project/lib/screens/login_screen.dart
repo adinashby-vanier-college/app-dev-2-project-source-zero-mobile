@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import '../../routes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -23,11 +24,38 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _signIn() async {
+  // Firebase sign-in logic
+  Future<void> _signIn() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      // Check if email or password are empty
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter email and password")),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isLoading = false);
-    if (mounted) Navigator.pushReplacementNamed(context, Routes.home);
+    try {
+      // Firebase sign-in with email and password
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+
+      // After successful login, navigate to home screen
+      if (userCredential.user != null) {
+        if (mounted) {
+          Navigator.pushReplacementNamed(context, Routes.home);
+        }
+      }
+    } on FirebaseAuthException catch (e) {
+      // Handle sign-in errors (e.g., incorrect password, user not found)
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Login failed')),
+      );
+    } finally {
+      setState(() => _isLoading = false); // Stop loading indicator
+    }
   }
 
   @override
@@ -303,16 +331,12 @@ class _LoginScreenState extends State<LoginScreen> {
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: const Color(0xFF2E5D32).withOpacity(0.2),
             spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
           ),
         ],
-        border: Border.all(
-          color: const Color(0xFF2E5D32).withOpacity(0.1),
-          width: 1,
-        ),
       ),
       child: Center(
         child: FaIcon(
