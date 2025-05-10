@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../routes.dart';
 import '../support_chat_screen.dart';
+import 'product_management_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -236,7 +237,10 @@ class AdminDashboardScreen extends StatelessWidget {
               // Handle add product
             }),
             _buildActionCard(context, 'Manage Inventory', Icons.inventory_outlined, () {
-              // Handle inventory
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProductManagementScreen()),
+              );
             }),
             _buildActionCard(context, 'View Reports', Icons.analytics_outlined, () {
               // Handle reports
