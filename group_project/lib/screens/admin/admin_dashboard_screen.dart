@@ -234,7 +234,10 @@ class AdminDashboardScreen extends StatelessWidget {
           mainAxisSpacing: 15,
           children: [
             _buildActionCard(context, 'Add Product', Icons.add_circle_outline, () {
-              // Handle add product
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ProductManagementScreen()),
+              );
             }),
             _buildActionCard(context, 'Manage Inventory', Icons.inventory_outlined, () {
               Navigator.push(
