@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/bottom_navigation.dart';
 import '../routes.dart';
@@ -30,9 +29,9 @@ class ProductsScreen extends StatelessWidget {
           children: [
             const SizedBox(height: 20),
             _buildFilterOptions(context),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
             _buildProductGrid(context),
-            const SizedBox(height: 30),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -51,6 +50,9 @@ class ProductsScreen extends StatelessWidget {
                 width: 1.5,
               ),
               padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () {},
             child: Row(
@@ -62,6 +64,7 @@ class ProductsScreen extends StatelessWidget {
                   'Filters',
                   style: GoogleFonts.lato(
                     fontWeight: FontWeight.bold,
+                    fontSize: 14,
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
@@ -78,6 +81,9 @@ class ProductsScreen extends StatelessWidget {
                 width: 1.5,
               ),
               padding: const EdgeInsets.symmetric(vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             onPressed: () {},
             child: Row(
@@ -89,6 +95,7 @@ class ProductsScreen extends StatelessWidget {
                   'Sort',
                   style: GoogleFonts.lato(
                     fontWeight: FontWeight.bold,
+                    fontSize: 14,
                     color: Theme.of(context).primaryColor,
                   ),
                 ),
@@ -105,51 +112,50 @@ class ProductsScreen extends StatelessWidget {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      childAspectRatio: 0.75,
-      crossAxisSpacing: 15,
-      mainAxisSpacing: 15,
+      childAspectRatio: 0.7,
+      crossAxisSpacing: 12,
+      mainAxisSpacing: 12,
       children: [
-        _buildProductCard(context, 'Organic Tomatoes', '\$3.99', 'assets/images/tomatoes.jpg'),
-        _buildProductCard(context, 'Fresh Apples', '\$2.49', 'assets/images/apples.jpg'),
-        _buildProductCard(context, 'Whole Grain Bread', '\$4.99', 'assets/images/bread.jpg'),
-        _buildProductCard(context, 'Organic Milk', '\$5.49', 'assets/images/milk.jpg'),
-        _buildProductCard(context, 'Carrots', '\$1.99', 'assets/images/carrots.jpg'),
-        _buildProductCard(context, 'Bananas', '\$0.99', 'assets/images/bananas.jpg'),
-        _buildProductCard(context, 'Organic Eggs', '\$4.49', 'assets/images/eggs.jpg'),
-        _buildProductCard(context, 'Spinach', '\$2.99', 'assets/images/spinach.jpg'),
+        _buildProductCard(context, 'Allulose Sweetener', '\$11.99', 'assets/allulose.webp'),
+        _buildProductCard(context, 'LMNT Electrolytes', '\$29.99', 'assets/LMNT.webp'),
+        _buildProductCard(context, 'Gluten free Bread', '\$5.99', 'assets/carbonaut.webp'),
+        _buildProductCard(context, 'Almond Butter', '\$9.49', 'assets/almondbutter.webp'),
+        _buildProductCard(context, 'Protein Powder', '\$35.99', 'assets/proteinpowder.webp'),
+        _buildProductCard(context, 'Cinnamon Sticks', '\$0.99', 'assets/cinnamon.jpg'),
+        _buildProductCard(context, 'Moisturizer', '\$4.49', 'assets/hydratingmoisturizer.jpeg'),
+        _buildProductCard(context, 'Zero Sugar Candy', '\$2.99', 'assets/zerocandy.webp'),
       ],
     );
   }
 
   Widget _buildProductCard(BuildContext context, String name, String price, String imagePath) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity,
+          AspectRatio(
+            aspectRatio: 1,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                color: Colors.grey[100],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
           ),
+
           Padding(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -157,30 +163,52 @@ class ProductsScreen extends StatelessWidget {
                   name,
                   style: GoogleFonts.lato(
                     fontWeight: FontWeight.bold,
+                    fontSize: 14,
                     color: Theme.of(context).primaryColor,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 4),
                 Text(
                   price,
                   style: GoogleFonts.lato(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                     color: Theme.of(context).primaryColor.withOpacity(0.8),
                   ),
                 ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 35),
-                    padding: EdgeInsets.zero,
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, Routes.productDetail);
-                  },
-                  child: const Text('Add to Cart'),
-                ),
               ],
+            ),
+          ),
+
+          const Spacer(),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: SizedBox(
+              height: 36,
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Theme.of(context).primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                onPressed: () {
+                  Navigator.pushNamed(context, Routes.productDetail);
+                },
+                child: Text(
+                  'Add to Cart',
+                  style: GoogleFonts.lato(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ),
         ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../routes.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -24,10 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Firebase sign-in logic
   Future<void> _signIn() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      // Check if email or password are empty
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter email and password")),
       );
@@ -36,25 +34,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
     try {
-      // Firebase sign-in with email and password
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
-      // After successful login, navigate to home screen
-      if (userCredential.user != null) {
-        if (mounted) {
-          Navigator.pushReplacementNamed(context, Routes.home);
-        }
+      if (userCredential.user != null && mounted) {
+        Navigator.pushReplacementNamed(context, Routes.home);
       }
     } on FirebaseAuthException catch (e) {
-      // Handle sign-in errors (e.g., incorrect password, user not found)
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(e.message ?? 'Login failed')),
       );
     } finally {
-      setState(() => _isLoading = false); // Stop loading indicator
+      setState(() => _isLoading = false);
     }
   }
 
@@ -97,23 +90,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildLogo(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF2E5D32).withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.center,
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
             'S',
@@ -123,24 +104,28 @@ class _LoginScreenState extends State<LoginScreen> {
               color: Theme.of(context).primaryColor,
             ),
           ),
-          Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Text(
-                '@',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+          const SizedBox(width: 6),
+          Image.asset(
+            'assets/logo.png',
+            width: 24,
+            height: 24,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  shape: BoxShape.circle,
                 ),
-              ),
-            ),
+                child: const Icon(
+                  FontAwesomeIcons.leaf,
+                  color: Colors.white,
+                  size: 14,
+                ),
+              );
+            },
           ),
+          const SizedBox(width: 6),
           Text(
             'Z',
             style: GoogleFonts.playfairDisplay(

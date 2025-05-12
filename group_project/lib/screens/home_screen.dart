@@ -12,45 +12,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Source',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Text(
-                  '@',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
-            ),
-            Text(
-              'Zero',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ],
-        ),
+        title: _buildLogo(context),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -82,6 +44,56 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: const SourceZeroBottomNavigationBar(currentIndex: 0),
+    );
+  }
+
+  Widget _buildLogo(BuildContext context) {
+    return FittedBox(
+      fit: BoxFit.scaleDown,
+      alignment: Alignment.centerLeft,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Source',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Image.asset(
+            'assets/logo.png',
+            height: 24,
+            width: 24,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                height: 24,
+                width: 24,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  FontAwesomeIcons.leaf,
+                  color: Colors.white,
+                  size: 14,
+                ),
+              );
+            },
+          ),
+          const SizedBox(width: 6),
+          Text(
+            'Zero',
+            style: GoogleFonts.playfairDisplay(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -253,10 +265,10 @@ class HomeScreen extends StatelessWidget {
           crossAxisSpacing: 15,
           mainAxisSpacing: 15,
           children: [
-            _buildProductCard(context, 'Organic Tomatoes', '\$3.99', 'assets/images/tomatoes.jpg'),
-            _buildProductCard(context, 'Fresh Apples', '\$2.49', 'assets/images/apples.jpg'),
-            _buildProductCard(context, 'Whole Grain Bread', '\$4.99', 'assets/images/bread.jpg'),
-            _buildProductCard(context, 'Organic Milk', '\$5.49', 'assets/images/milk.jpg'),
+            _buildProductCard(context, 'Organic Dog Treats', '\$5.99', 'assets/treats.png'),
+            _buildProductCard(context, 'Extra Virgin Olive Oil', '\$12.99', 'assets/oliveoil.png'),
+            _buildProductCard(context, 'Blueprint', 'Starting from \$29.99', 'assets/blueprint.png'),
+            _buildProductCard(context, 'Organic Macademia Milk', '\$12.99', 'assets/macademia.jpg'),
           ],
         ),
       ],
