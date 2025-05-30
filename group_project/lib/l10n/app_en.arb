@@ -1,0 +1,15 @@
+{
+  "@@locale": "en",
+  "delivery_address": "Delivery Address",
+  "search_for_address": "Search for an address",
+  "no_addresses_found": "No addresses found",
+  "street_address": "Street address",
+  "city": "City",
+  "state": "State",
+  "zip_code": "ZIP code",
+  "country": "Country",
+  "save_address": "Save Address",
+  "set_as_main": "Set as Main",
+  "saved_addresses": "Saved Addresses",
+  "no_saved_addresses_yet": "No saved addresses yet"
+}
