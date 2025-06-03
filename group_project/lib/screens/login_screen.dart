@@ -6,6 +6,7 @@ import '../../routes.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'dart:html' as html;
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -13,30 +14,37 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    ));
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
+    _animationController.dispose();
     super.dispose();
-  }
-
-  Future<void> _testGoogleSignIn() async {
-    try {
-      final googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) {
-        print('User cancelled sign-in');
-      } else {
-        print('Signed in: ${googleUser.email}');
-      }
-    } catch (e) {
-      print('Error during Google sign-in: $e');
-    }
   }
 
   Future<void> signInWithGoogleWebPopup() async {
@@ -55,7 +63,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-
   Future<void> signInWithFacebookWebPopup() async {
     try {
       final provider = firebase_auth.FacebookAuthProvider();
@@ -71,7 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
   }
-
 
   Future<void> _signIn() async {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
@@ -100,73 +106,54 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
-    setState(() => _isLoading = true);
-    try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-      if (googleUser == null) {
-        // User canceled the sign-in
-        setState(() => _isLoading = false);
-        return;
-      }
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
-
-      if (userCredential.user != null && mounted) {
-        Navigator.pushReplacementNamed(context, Routes.home);
-      }
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? 'Google sign-in failed')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred during Google sign-in')),
-      );
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFADDD1),
+      backgroundColor: const Color(0xFFFDFDFD),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF2E5D32)),
-          onPressed: () => Navigator.pop(context),
+        leading: Container(
+          margin: const EdgeInsets.only(left: 16, top: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5D32).withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2E5D32)),
+            onPressed: () => Navigator.pop(context),
+          ),
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(height: 10),
-                _buildLogo(context),
-                const SizedBox(height: 30),
-                _buildWelcomeText(),
-                const SizedBox(height: 40),
-                _buildLoginForm(context),
-                const SizedBox(height: 30),
-                _buildSocialLoginOptions(context),
-                const SizedBox(height: 40),
-                _buildSignUpPrompt(context),
-                const SizedBox(height: 20),
-              ],
+        child: FadeTransition(
+          opacity: _fadeAnimation,
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildMinimalLogo(context),
+                  const SizedBox(height: 50),
+                  _buildWelcomeSection(),
+                  const SizedBox(height: 50),
+                  _buildLoginForm(context),
+                  const SizedBox(height: 40),
+                  _buildSocialSection(context),
+                  const SizedBox(height: 50),
+                  _buildSignUpSection(context),
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
           ),
         ),
@@ -174,77 +161,74 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-
-  Widget _buildLogo(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.center,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'S',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
+  Widget _buildMinimalLogo(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: const BoxDecoration(
+            color: Color(0xFFB6D433),
+            shape: BoxShape.circle,
           ),
-          const SizedBox(width: 6),
-          Image.asset(
-            'assets/logo.png',
-            width: 24,
-            height: 24,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  FontAwesomeIcons.leaf,
-                  color: Colors.white,
-                  size: 14,
-                ),
-              );
-            },
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'source',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 2,
           ),
-          const SizedBox(width: 6),
-          Text(
-            'Z',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          width: 1,
+          height: 16,
+          color: const Color(0xFF2E5D32).withOpacity(0.3),
+        ),
+        Text(
+          'zero',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
-  Widget _buildWelcomeText() {
+  Widget _buildWelcomeSection() {
     return Column(
       children: [
         Text(
-          'Welcome Back',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 32,
-            fontWeight: FontWeight.bold,
+          'welcome back',
+          style: GoogleFonts.poppins(
+            fontSize: 28,
+            fontWeight: FontWeight.w200,
             color: const Color(0xFF2E5D32),
+            letterSpacing: 0.5,
           ),
-          textAlign: TextAlign.center,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 12),
+        Container(
+          width: 40,
+          height: 1,
+          color: const Color(0xFFB6D433),
+        ),
+        const SizedBox(height: 12),
         Text(
-          'Sign in to continue your organic journey',
-          style: GoogleFonts.lato(
-            fontSize: 16,
-            color: const Color(0xFF2E5D32).withOpacity(0.8),
+          'continue your mindful journey',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.6),
+            letterSpacing: 0.8,
           ),
-          textAlign: TextAlign.center,
         ),
       ],
     );
@@ -252,126 +236,200 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildLoginForm(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 5),
+            color: const Color(0xFF2E5D32).withOpacity(0.08),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
-        border: Border.all(
-          color: const Color(0xFF2E5D32).withOpacity(0.1),
-          width: 1,
-        ),
       ),
       child: Column(
         children: [
-          TextField(
+          _buildTextField(
             controller: _emailController,
-            decoration: InputDecoration(
-              hintText: 'Email',
-              prefixIcon: Icon(
-                Icons.email_outlined,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
+            hint: 'email address',
+            icon: Icons.alternate_email_rounded,
           ),
-          const SizedBox(height: 20),
-          TextField(
+          const SizedBox(height: 24),
+          _buildTextField(
             controller: _passwordController,
-            obscureText: _obscurePassword,
-            decoration: InputDecoration(
-              hintText: 'Password',
-              prefixIcon: Icon(
-                Icons.lock_outline,
-                color: Theme.of(context).primaryColor,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                  color: Theme.of(context).primaryColor.withOpacity(0.7),
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscurePassword = !_obscurePassword;
-                  });
-                },
-              ),
-            ),
+            hint: 'password',
+            icon: Icons.lock_outline_rounded,
+            isPassword: true,
           ),
+          const SizedBox(height: 16),
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {},
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+              ),
               child: Text(
-                'Forgot Password?',
-                style: GoogleFonts.lato(
-                  fontSize: 14,
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.w500,
+                'forgot password?',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w300,
+                  color: const Color(0xFF2E5D32).withOpacity(0.6),
+                  letterSpacing: 0.5,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor,
-              foregroundColor: Colors.white,
-              minimumSize: const Size(double.infinity, 55),
-            ),
-            onPressed: _isLoading ? null : _signIn,
-            child: _isLoading
-                ? const SizedBox(
-              height: 24,
-              width: 24,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
-            )
-                : const Text('LOGIN'),
-          ),
+          const SizedBox(height: 32),
+          _buildSignInButton(),
         ],
       ),
     );
   }
 
-  Widget _buildSocialLoginOptions(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          'Or continue with',
-          style: GoogleFonts.lato(
-            color: const Color(0xFF2E5D32).withOpacity(0.7),
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    bool isPassword = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword ? _obscurePassword : false,
+        style: GoogleFonts.poppins(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: const Color(0xFF2E5D32),
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: GoogleFonts.poppins(
             fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.4),
+          ),
+          prefixIcon: Icon(
+            icon,
+            color: const Color(0xFF2E5D32).withOpacity(0.4),
+            size: 20,
+          ),
+          suffixIcon: isPassword
+              ? IconButton(
+            icon: Icon(
+              _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+              color: const Color(0xFF2E5D32).withOpacity(0.4),
+              size: 20,
+            ),
+            onPressed: () {
+              setState(() {
+                _obscurePassword = !_obscurePassword;
+              });
+            },
+          )
+              : null,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSignInButton() {
+    return Container(
+      width: double.infinity,
+      height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2E5D32).withOpacity(0.15),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF2E5D32),
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(26),
+          ),
+          elevation: 0,
+        ),
+        onPressed: _isLoading ? null : _signIn,
+        child: _isLoading
+            ? const SizedBox(
+          height: 20,
+          width: 20,
+          child: CircularProgressIndicator(
+            color: Colors.white,
+            strokeWidth: 2,
+          ),
+        )
+            : Text(
+          'sign in',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+            letterSpacing: 1.5,
           ),
         ),
-        const SizedBox(height: 20),
+      ),
+    );
+  }
+
+  Widget _buildSocialSection(BuildContext context) {
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(child: Divider(color: const Color(0xFF2E5D32).withOpacity(0.1))),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'or continue with',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w300,
+                  color: const Color(0xFF2E5D32).withOpacity(0.4),
+                  letterSpacing: 0.8,
+                ),
+              ),
+            ),
+            Expanded(child: Divider(color: const Color(0xFF2E5D32).withOpacity(0.1))),
+          ],
+        ),
+        const SizedBox(height: 32),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GestureDetector(
-              onTap: _isLoading ? null : () async {
+            _buildSocialButton(
+              icon: FontAwesomeIcons.google,
+              onTap: () async {
                 setState(() => _isLoading = true);
                 await signInWithGoogleWebPopup();
                 setState(() => _isLoading = false);
               },
-              child: _socialLoginButton(context, FontAwesomeIcons.google, 'Google'),
             ),
-            const SizedBox(width: 16),
-            GestureDetector(
-              onTap: _isLoading ? null : () async {
+            const SizedBox(width: 20),
+            _buildSocialButton(
+              icon: FontAwesomeIcons.facebook,
+              onTap: () async {
                 setState(() => _isLoading = true);
                 await signInWithFacebookWebPopup();
                 setState(() => _isLoading = false);
               },
-              child: _socialLoginButton(context, FontAwesomeIcons.facebook, 'Facebook'),
             ),
           ],
         ),
@@ -379,57 +437,57 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Widget _buildSocialButton({required IconData icon, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: _isLoading ? null : onTap,
+      child: Container(
+        width: 56,
+        height: 56,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2E5D32).withOpacity(0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Icon(
+          icon,
+          color: const Color(0xFF2E5D32),
+          size: 20,
+        ),
+      ),
+    );
+  }
 
-
-  Widget _buildSignUpPrompt(BuildContext context) {
+  Widget _buildSignUpSection(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          "Don't have an account? ",
-          style: GoogleFonts.lato(
-            color: const Color(0xFF2E5D32).withOpacity(0.8),
+          'new to source zero? ',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.6),
           ),
         ),
         GestureDetector(
-          onTap: () {
-            Navigator.pushReplacementNamed(context, Routes.signup);
-          },
+          onTap: () => Navigator.pushReplacementNamed(context, Routes.signup),
           child: Text(
-            'Sign Up',
-            style: GoogleFonts.lato(
+            'create account',
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
               color: const Color(0xFF2E5D32),
-              fontWeight: FontWeight.bold,
+              letterSpacing: 0.3,
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _socialLoginButton(BuildContext context, IconData icon, String label) {
-    return Container(
-      width: 80,
-      height: 55,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF2E5D32).withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Center(
-        child: FaIcon(
-          icon,
-          color: const Color(0xFF2E5D32),
-          size: 24,
-        ),
-      ),
     );
   }
 }

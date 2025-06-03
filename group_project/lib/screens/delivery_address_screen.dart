@@ -4,6 +4,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class DeliveryAddressScreen extends StatefulWidget {
   const DeliveryAddressScreen({Key? key}) : super(key: key);
@@ -24,6 +26,8 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
   SavedAddress? _selectedAddress;
   bool _isLoading = false;
 
+  final String _apiKey = 'AIzaSyC0064ds-xg1CFwF946x6JQj00AsxB_lFo';
+
   @override
   void initState() {
     super.initState();
@@ -41,13 +45,79 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
     super.dispose();
   }
 
+  Future<List<String>> _getSuggestions(String query) async {
+    final url =
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query&key=$_apiKey&types=address';
+    final response = await http.get(Uri.parse(url));
+    final data = json.decode(response.body);
+    if (data['status'] == 'OK') {
+      return List<String>.from(
+        data['predictions'].map((p) => p['description']),
+      );
+    } else {
+      return [];
+    }
+  }
+
+  Future<void> _getPlaceDetails(String description) async {
+    final autocompleteUrl =
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$description&key=$_apiKey&types=address';
+    final autocompleteResp = await http.get(Uri.parse(autocompleteUrl));
+    final predictions = json.decode(autocompleteResp.body)['predictions'];
+    if (predictions.isEmpty) return;
+
+    final placeId = predictions[0]['place_id'];
+    final detailsUrl =
+        'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&key=$_apiKey';
+    final detailsResp = await http.get(Uri.parse(detailsUrl));
+    final result = json.decode(detailsResp.body)['result'];
+
+    final components = result['address_components'] as List;
+    String getComponent(String type) {
+      return components.firstWhere(
+            (c) => (c['types'] as List).contains(type),
+        orElse: () => {'long_name': ''},
+      )['long_name'];
+    }
+
+    setState(() {
+      _searchController.text = result['formatted_address'] ?? '';
+      _streetController.text = getComponent("route") + ' ' + getComponent("street_number");
+      _cityController.text = getComponent("locality") != ''
+          ? getComponent("locality")
+          : getComponent("sublocality");
+      _stateController.text = getComponent("administrative_area_level_1");
+      _zipController.text = getComponent("postal_code");
+      _countryController.text = getComponent("country");
+    });
+  }
+
+  Future<void> _updateAddressFromCoordinates(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks.first;
+        setState(() {
+          _streetController.text =
+              [place.street, place.thoroughfare].where((s) => s != null && s.isNotEmpty).join(' ').trim();
+          _cityController.text = place.locality ?? place.subLocality ?? '';
+          _stateController.text = place.administrativeArea ?? '';
+          _zipController.text = place.postalCode ?? '';
+          _countryController.text = place.country ?? '';
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error getting address details: ${e.toString()}')),
+      );
+    }
+  }
+
   Future<void> _getCurrentLocation() async {
     setState(() => _isLoading = true);
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        throw Exception('Location services are disabled. Please enable them.');
-      }
+      if (!serviceEnabled) throw Exception('Enable location services.');
 
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
@@ -58,38 +128,30 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        throw Exception('Location permissions are permanently denied. Please enable them in app settings.');
+        // Show dialog instead of throwing
+        await showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Location Permission'),
+            content: const Text(
+                'Location permissions are permanently denied. Please enable them in your device settings.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
       }
 
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      );
-
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks.first;
-        setState(() {
-          _streetController.text = [
-            place.street,
-            place.thoroughfare
-          ].where((s) => s != null && s.isNotEmpty).join(' ');
-          _cityController.text = place.locality ?? '';
-          _stateController.text = place.administrativeArea ?? '';
-          _zipController.text = place.postalCode ?? '';
-          _countryController.text = place.country ?? '';
-        });
-      }
+          desiredAccuracy: LocationAccuracy.high);
+      await _updateAddressFromCoordinates(position.latitude, position.longitude);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: ${e.toString()}'),
-          duration: const Duration(seconds: 5),
-        ),
-      );
+          SnackBar(content: Text('Error: ${e.toString()}')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -103,6 +165,14 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User not authenticated')),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
 
     try {
@@ -110,7 +180,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         final batch = FirebaseFirestore.instance.batch();
         final existing = await FirebaseFirestore.instance
             .collection('user_addresses')
-            .where('userId', isEqualTo: FirebaseAuth.instance.currentUser?.uid)
+            .where('userId', isEqualTo: user.uid)
             .where('isMain', isEqualTo: true)
             .get();
 
@@ -126,10 +196,11 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
         'state': _stateController.text,
         'zip': _zipController.text,
         'country': _countryController.text,
-        'fullAddress': '${_streetController.text}, ${_cityController.text}, ${_stateController.text}, ${_countryController.text}',
+        'fullAddress':
+        '${_streetController.text}, ${_cityController.text}, ${_stateController.text}, ${_countryController.text}',
         'isMain': isMain,
         'timestamp': FieldValue.serverTimestamp(),
-        'userId': FirebaseAuth.instance.currentUser?.uid,
+        'userId': user.uid,
       });
 
       await _loadSavedAddresses();
@@ -144,6 +215,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
       setState(() => _isLoading = false);
     }
   }
+
 
   Future<void> _loadSavedAddresses() async {
     try {
@@ -243,7 +315,7 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            TypeAheadField<Location>(
+            TypeAheadField(
               textFieldConfiguration: TextFieldConfiguration(
                 controller: _searchController,
                 decoration: const InputDecoration(
@@ -252,44 +324,11 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                   border: OutlineInputBorder(),
                 ),
               ),
-              suggestionsCallback: (pattern) async {
-                if (pattern.length < 3) return <Location>[];
-                try {
-                  return await locationFromAddress(pattern);
-                } catch (e) {
-                  return <Location>[];
-                }
+              suggestionsCallback: _getSuggestions,
+              itemBuilder: (context, suggestion) {
+                return ListTile(title: Text(suggestion));
               },
-              itemBuilder: (context, Location suggestion) {
-                return ListTile(
-                  title: Text('${suggestion.latitude}, ${suggestion.longitude}'),
-                );
-              },
-              onSuggestionSelected: (Location suggestion) async {
-                try {
-                  List<Placemark> placemarks = await placemarkFromCoordinates(
-                    suggestion.latitude,
-                    suggestion.longitude,
-                  );
-                  if (placemarks.isNotEmpty) {
-                    Placemark place = placemarks.first;
-                    setState(() {
-                      _streetController.text = [
-                        place.street,
-                        place.thoroughfare
-                      ].where((s) => s != null && s.isNotEmpty).join(' ');
-                      _cityController.text = place.locality ?? '';
-                      _stateController.text = place.administrativeArea ?? '';
-                      _zipController.text = place.postalCode ?? '';
-                      _countryController.text = place.country ?? '';
-                    });
-                  }
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Error: ${e.toString()}')),
-                  );
-                }
-              },
+              onSuggestionSelected: _getPlaceDetails,
             ),
             const SizedBox(height: 20),
             TextFormField(
@@ -407,16 +446,13 @@ class _DeliveryAddressScreenState extends State<DeliveryAddressScreen> {
                   final address = _savedAddresses[index];
                   return Card(
                     margin: const EdgeInsets.symmetric(vertical: 4),
-                    color: _selectedAddress?.id == address.id
-                        ? Colors.blue[50]
-                        : null,
+                    color: _selectedAddress?.id == address.id ? Colors.blue[50] : null,
                     child: ListTile(
                       leading: address.isMain
                           ? const Icon(Icons.star, color: Colors.amber)
                           : const Icon(Icons.location_on),
                       title: Text(address.street),
-                      subtitle: Text(
-                          '${address.city}, ${address.state} ${address.zip}'),
+                      subtitle: Text('${address.city}, ${address.state} ${address.zip}'),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () => _deleteAddress(address.id),

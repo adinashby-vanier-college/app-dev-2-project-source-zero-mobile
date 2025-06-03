@@ -27,13 +27,15 @@ class SourceZeroApp extends StatelessWidget {
         Locale('es'), // Add more supported locales as needed
       ],
       localeResolutionCallback: (locale, supportedLocales) {
+        if (locale == null) return supportedLocales.first;
         for (final supportedLocale in supportedLocales) {
-          if (supportedLocale.languageCode == locale?.languageCode) {
+          if (supportedLocale.languageCode == locale.languageCode) {
             return supportedLocale;
           }
         }
         return supportedLocales.first;
       },
+
 
       // ✅ Theme
       theme: ThemeData(

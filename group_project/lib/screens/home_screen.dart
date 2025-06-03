@@ -10,110 +10,136 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        title: _buildLogo(context),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            color: Theme.of(context).primaryColor,
-            onPressed: () {},
+      backgroundColor: const Color(0xFFFDFDFD),
+      body: CustomScrollView(
+        slivers: [
+          _buildSliverAppBar(context),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  _buildWelcomeSection(context),
+                  const SizedBox(height: 35),
+                  _buildSearchBar(context),
+                  const SizedBox(height: 40),
+                  _buildCategoriesSection(context),
+                  const SizedBox(height: 45),
+                  _buildFeaturedSection(context),
+                  const SizedBox(height: 40),
+                  _buildArtisticOfferCard(context),
+                ],
+              ),
+            ),
           ),
         ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            _buildWelcomeText(context),
-            const SizedBox(height: 30),
-            _buildSearchBar(context),
-            const SizedBox(height: 30),
-            _buildCategoriesSection(context),
-            const SizedBox(height: 30),
-            _buildFeaturedProductsSection(context),
-            const SizedBox(height: 30),
-            _buildSpecialOfferCard(context),
-            const SizedBox(height: 30),
-          ],
-        ),
       ),
       bottomNavigationBar: const SourceZeroBottomNavigationBar(currentIndex: 0),
     );
   }
 
-  Widget _buildLogo(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.centerLeft,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Source',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          const SizedBox(width: 6),
-          Image.asset(
-            'assets/logo.png',
-            height: 24,
-            width: 24,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: 24,
-                width: 24,
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  FontAwesomeIcons.leaf,
-                  color: Colors.white,
-                  size: 14,
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 6),
-          Text(
-            'Zero',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-        ],
+  Widget _buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 120,
+      floating: true,
+      pinned: true,
+      backgroundColor: const Color(0xFFFDFDFD),
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        centerTitle: true,
+        title: _buildMinimalLogo(context),
+        titlePadding: const EdgeInsets.only(bottom: 16),
       ),
+      actions: [
+        Container(
+          margin: const EdgeInsets.only(right: 16, top: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5D32).withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.notifications_none_rounded),
+            color: const Color(0xFF2E5D32),
+            iconSize: 22,
+            onPressed: () {},
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildWelcomeText(BuildContext context) {
+  Widget _buildMinimalLogo(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: const BoxDecoration(
+            color: Color(0xFFB6D433),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'source',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 2,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          width: 1,
+          height: 16,
+          color: const Color(0xFF2E5D32).withOpacity(0.3),
+        ),
+        Text(
+          'zero',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWelcomeSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Hello there,',
-          style: GoogleFonts.lato(
-            fontSize: 18,
-            color: Theme.of(context).primaryColor.withOpacity(0.8),
+          'discover',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.6),
+            letterSpacing: 3,
           ),
         ),
+        const SizedBox(height: 4),
         Text(
-          'What are you looking for today?',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
+          'mindful living',
+          style: GoogleFonts.poppins(
+            fontSize: 28,
+            fontWeight: FontWeight.w200,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: -0.5,
+            height: 1.1,
           ),
         ),
       ],
@@ -122,112 +148,118 @@ class HomeScreen extends StatelessWidget {
 
   Widget _buildSearchBar(BuildContext context) {
     return Container(
+      height: 52,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(26),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+            color: const Color(0xFF2E5D32).withOpacity(0.06),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
       child: TextField(
         decoration: InputDecoration(
           filled: true,
-          fillColor: Colors.white,
-          hintText: 'Search products...',
-          prefixIcon: Icon(
-            Icons.search,
-            color: Theme.of(context).primaryColor,
+          fillColor: Colors.transparent,
+          hintText: 'search organic products',
+          hintStyle: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.4),
+          ),
+          prefixIcon: Container(
+            padding: const EdgeInsets.all(14),
+            child: const Icon(
+              Icons.search_rounded,
+              color: Color(0xFF2E5D32),
+              size: 20,
+            ),
           ),
           border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(26),
             borderSide: BorderSide.none,
           ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20),
         ),
       ),
     );
   }
 
   Widget _buildCategoriesSection(BuildContext context) {
+    final categories = [
+      {'name': 'fresh', 'icon': FontAwesomeIcons.leaf},
+      {'name': 'pantry', 'icon': FontAwesomeIcons.jar},
+      {'name': 'wellness', 'icon': FontAwesomeIcons.spa},
+      {'name': 'home', 'icon': FontAwesomeIcons.home},
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Categories',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
+          'explore',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
           ),
         ),
-        const SizedBox(height: 15),
-        SizedBox(
-          height: 120,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            children: [
-              _buildCategoryCard(context, 'Vegetables', FontAwesomeIcons.carrot),
-              const SizedBox(width: 15),
-              _buildCategoryCard(context, 'Fruits', FontAwesomeIcons.appleAlt),
-              const SizedBox(width: 15),
-              _buildCategoryCard(context, 'Grains', FontAwesomeIcons.breadSlice),
-              const SizedBox(width: 15),
-              _buildCategoryCard(context, 'Dairy', FontAwesomeIcons.cheese),
-            ],
-          ),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: categories.map((category) =>
+              _buildMinimalCategoryCard(context, category['name'] as String, category['icon'] as IconData)
+          ).toList(),
         ),
       ],
     );
   }
 
-  Widget _buildCategoryCard(BuildContext context, String title, IconData icon) {
-    return Container(
-      width: 100,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
-              shape: BoxShape.circle,
+  Widget _buildMinimalCategoryCard(BuildContext context, String title, IconData icon) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        height: 80,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2E5D32).withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
-            child: Icon(
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
               icon,
-              color: Theme.of(context).primaryColor,
-              size: 24,
+              color: const Color(0xFFB6D433),
+              size: 20,
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            title,
-            style: GoogleFonts.lato(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
+            const SizedBox(height: 8),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF2E5D32),
+                letterSpacing: 0.5,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildFeaturedProductsSection(BuildContext context) {
+  Widget _buildFeaturedSection(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -235,57 +267,61 @@ class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Featured Products',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
+              'curated for you',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                color: const Color(0xFF2E5D32),
+                letterSpacing: 1,
               ),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.pushNamed(context, Routes.products);
-              },
+              onPressed: () => Navigator.pushNamed(context, Routes.products),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.zero,
+                minimumSize: Size.zero,
+              ),
               child: Text(
-                'View All',
-                style: GoogleFonts.lato(
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.bold,
+                'view all',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w300,
+                  color: const Color(0xFF2E5D32).withOpacity(0.6),
+                  letterSpacing: 1,
                 ),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 15),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          childAspectRatio: 0.8,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
-          children: [
-            _buildProductCard(context, 'Organic Dog Treats', '\$5.99', 'assets/treats.png'),
-            _buildProductCard(context, 'Extra Virgin Olive Oil', '\$12.99', 'assets/oliveoil.png'),
-            _buildProductCard(context, 'Blueprint', 'Starting from \$29.99', 'assets/blueprint.png'),
-            _buildProductCard(context, 'Organic Macademia Milk', '\$12.99', 'assets/macademia.jpg'),
-          ],
+        const SizedBox(height: 20),
+        SizedBox(
+          height: 280,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            children: [
+              _buildArtisticProductCard(context, 'organic treats', '5.99', 'assets/treats.png'),
+              _buildArtisticProductCard(context, 'cold pressed oil', '12.99', 'assets/oliveoil.png'),
+              _buildArtisticProductCard(context, 'wellness bundle', '29.99', 'assets/blueprint.png'),
+              _buildArtisticProductCard(context, 'nut milk', '12.99', 'assets/macademia.jpg'),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildProductCard(BuildContext context, String name, String price, String imagePath) {
+  Widget _buildArtisticProductCard(BuildContext context, String name, String price, String imagePath) {
     return Container(
+      width: 160,
+      margin: const EdgeInsets.only(right: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF2E5D32).withOpacity(0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -293,48 +329,79 @@ class HomeScreen extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity,
+            flex: 3,
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                color: const Color(0xFFF8F9FA),
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: const Color(0xFFB6D433).withOpacity(0.1),
+                      child: const Icon(
+                        FontAwesomeIcons.image,
+                        color: Color(0xFF2E5D32),
+                        size: 32,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: GoogleFonts.lato(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+          Expanded(
+            flex: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF2E5D32),
+                      letterSpacing: 0.3,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  price,
-                  style: GoogleFonts.lato(
-                    color: Theme.of(context).primaryColor.withOpacity(0.8),
+                  const Spacer(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '\$$price',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF2E5D32),
+                        ),
+                      ),
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFB6D433),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Icon(
+                          Icons.add_rounded,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 10),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).primaryColor,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(double.infinity, 35),
-                    padding: EdgeInsets.zero,
-                  ),
-                  onPressed: () {
-                    Navigator.pushNamed(context, Routes.productDetail);
-                  },
-                  child: const Text('Add to Cart'),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -342,37 +409,63 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSpecialOfferCard(BuildContext context) {
+  Widget _buildArtisticOfferCard(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      height: 120,
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFFB6D433).withOpacity(0.15),
+            const Color(0xFF2E5D32).withOpacity(0.05),
+          ],
+        ),
+        border: Border.all(
+          color: const Color(0xFFB6D433).withOpacity(0.2),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.local_offer_outlined,
-            size: 40,
-            color: Color(0xFF2E5D32),
+          Container(
+            width: 50,
+            height: 50,
+            decoration: BoxDecoration(
+              color: const Color(0xFFB6D433).withOpacity(0.2),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(
+              FontAwesomeIcons.percent,
+              color: Color(0xFF2E5D32),
+              size: 20,
+            ),
           ),
-          const SizedBox(width: 15),
+          const SizedBox(width: 20),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Special Offer',
-                  style: GoogleFonts.playfairDisplay(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                  'first time here?',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF2E5D32),
+                    letterSpacing: 0.5,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
-                  'Get 20% off on your first order!',
-                  style: GoogleFonts.lato(
-                    color: Theme.of(context).primaryColor.withOpacity(0.8),
+                  'enjoy 20% off your first order',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w300,
+                    color: const Color(0xFF2E5D32).withOpacity(0.7),
+                    letterSpacing: 0.3,
                   ),
                 ),
               ],

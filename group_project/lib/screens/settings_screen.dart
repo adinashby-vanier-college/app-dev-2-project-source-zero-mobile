@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../widgets/bottom_navigation.dart';
 import '../routes.dart';
@@ -15,50 +16,112 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        title: Text(
-          'Settings',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
+      backgroundColor: const Color(0xFFFDFDFD),
+      body: CustomScrollView(
+        slivers: [
+          _buildSliverAppBar(context),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildTitleSection(context),
+                  const SizedBox(height: 20),
+                  _buildProfileSection(context),
+                  const SizedBox(height: 30),
+                  _buildSettingsSection(context),
+                ],
+              ),
+            ),
           ),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            _buildProfileSection(context),
-            const SizedBox(height: 20),
-            _buildSettingsOptions(context),
-            const SizedBox(height: 30),
-            _buildLogoutButton(context),
-            const SizedBox(height: 30),
-          ],
-        ),
+        ],
       ),
       bottomNavigationBar: const SourceZeroBottomNavigationBar(currentIndex: 3),
     );
   }
 
+  Widget _buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 100,
+      floating: true,
+      pinned: true,
+      backgroundColor: const Color(0xFFFDFDFD),
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
+        centerTitle: true,
+        title: _buildMinimalLogo(context),
+        titlePadding: const EdgeInsets.only(bottom: 16),
+      ),
+    );
+  }
+
+  Widget _buildMinimalLogo(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: const BoxDecoration(
+            color: Color(0xFFB6D433),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'source',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 2,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          width: 1,
+          height: 16,
+          color: const Color(0xFF2E5D32).withOpacity(0.3),
+        ),
+        Text(
+          'zero',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTitleSection(BuildContext context) {
+    return Text(
+      'settings',
+      style: GoogleFonts.poppins(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: const Color(0xFF2E5D32),
+        letterSpacing: 1,
+      ),
+    );
+  }
+
   Widget _buildProfileSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          )
+            color: const Color(0xFF2E5D32).withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
       child: Row(
@@ -68,30 +131,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
             height: 60,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              image: const DecorationImage(
-                image: AssetImage('assets/images/profile.jpg'),
-                fit: BoxFit.cover,
-              ),
-              color: Theme.of(context).primaryColor.withOpacity(0.1),
+              color: const Color(0xFFB6D433).withOpacity(0.2),
+            ),
+            child: const Icon(
+              Icons.person_rounded,
+              color: Color(0xFF2E5D32),
+              size: 30,
             ),
           ),
-          const SizedBox(width: 15),
+          const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'John Doe',
-                  style: GoogleFonts.lato(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Theme.of(context).primaryColor,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF2E5D32),
                   ),
                 ),
                 Text(
                   'john.doe@example.com',
-                  style: GoogleFonts.lato(
-                    color: Theme.of(context).primaryColor.withOpacity(0.6),
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w300,
+                    color: const Color(0xFF2E5D32).withOpacity(0.6),
                   ),
                 ),
               ],
@@ -99,7 +165,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            color: Theme.of(context).primaryColor,
+            color: const Color(0xFF2E5D32),
             onPressed: () {},
           ),
         ],
@@ -107,113 +173,139 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildSettingsOptions(BuildContext context) {
+  Widget _buildSettingsSection(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 5,
-            offset: const Offset(0, 2),
-          )
+            color: const Color(0xFF2E5D32).withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
         ],
       ),
       child: Column(
         children: [
-          _buildSettingsOption(
+          _buildSettingsTile(
             context,
-            Icons.notifications_active_outlined,
-            'Notifications Manager',
-            Icons.chevron_right,
-                () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const NotificationManagerScreen(),
-                ),
-              );
-            },
+            FontAwesomeIcons.bell,
+            'Notifications',
+                () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const NotificationManagerScreen(),
+              ),
+            ),
           ),
-          const Divider(),
-          _buildSettingsOption(
+          const Divider(height: 24, color: Color(0xFFF1F1F1)),
+          _buildSettingsTile(
             context,
-            Icons.location_on_outlined,
+            FontAwesomeIcons.locationDot,
             'Delivery Address',
-            Icons.chevron_right,
-                () {
-              Navigator.pushNamed(context, Routes.deliveryAddress);
-            },
+                () => Navigator.pushNamed(context, Routes.deliveryAddress),
           ),
-          const Divider(),
-          _buildSettingsOption(
+          const Divider(height: 24, color: Color(0xFFF1F1F1)),
+          _buildSettingsTile(
             context,
-            Icons.payment_outlined,
+            FontAwesomeIcons.creditCard,
             'Payment Methods',
-            Icons.chevron_right,
                 () {},
           ),
-          const Divider(),
-          _buildSettingsOption(
+          const Divider(height: 24, color: Color(0xFFF1F1F1)),
+          _buildSettingsTile(
             context,
-            Icons.security_outlined,
+            FontAwesomeIcons.shield,
             'Privacy & Security',
-            Icons.chevron_right,
                 () {},
           ),
-          const Divider(),
-          _buildSettingsOption(
+          const Divider(height: 24, color: Color(0xFFF1F1F1)),
+          _buildSettingsTile(
             context,
-            Icons.help_outline,
+            FontAwesomeIcons.circleQuestion,
             'Help & Support',
-            Icons.chevron_right,
                 () {},
           ),
+          const Divider(height: 24, color: Color(0xFFF1F1F1)),
+          _buildLogoutButton(context),
         ],
       ),
     );
   }
 
-  Widget _buildSettingsOption(
+  Widget _buildSettingsTile(
       BuildContext context,
       IconData icon,
       String title,
-      IconData trailingIcon,
       VoidCallback onTap,
       ) {
     return ListTile(
-      leading: Icon(icon, color: Theme.of(context).primaryColor),
-      title: Text(
-        title,
-        style: GoogleFonts.lato(
-          fontWeight: FontWeight.w500,
-          color: Theme.of(context).primaryColor,
+      contentPadding: EdgeInsets.zero,
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: const Color(0xFFB6D433).withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Icon(
+          icon,
+          size: 16,
+          color: const Color(0xFF2E5D32),
         ),
       ),
-      trailing: Icon(
-        trailingIcon,
-        color: Theme.of(context).primaryColor.withOpacity(0.5),
+      title: Text(
+        title,
+        style: GoogleFonts.poppins(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: const Color(0xFF2E5D32),
+        ),
+      ),
+      trailing: const Icon(
+        Icons.chevron_right_rounded,
+        color: Color(0xFF2E5D32),
       ),
       onTap: onTap,
     );
   }
 
   Widget _buildLogoutButton(BuildContext context) {
-    return ElevatedButton(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.red,
-        minimumSize: const Size(double.infinity, 50),
-        side: BorderSide(color: Colors.red.withOpacity(0.2)),
+    return Container(
+      margin: const EdgeInsets.only(top: 16),
+      width: double.infinity,
+      height: 52,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(26),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2E5D32).withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
-      onPressed: () {
-        Navigator.pushReplacementNamed(context, Routes.welcome);
-      },
-      child: Text(
-        'Log Out',
-        style: GoogleFonts.lato(fontWeight: FontWeight.bold),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+          foregroundColor: const Color(0xFFE53935),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(26),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          Navigator.pushReplacementNamed(context, Routes.welcome);
+        },
+        child: Text(
+          'Log Out',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

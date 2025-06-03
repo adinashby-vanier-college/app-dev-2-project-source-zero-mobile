@@ -11,112 +11,185 @@ class AdminDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Source',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
+      backgroundColor: const Color(0xFFFDFDFD),
+      body: CustomScrollView(
+        slivers: [
+          _buildSliverAppBar(context),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  _buildWelcomeSection(context),
+                  const SizedBox(height: 30),
+                  _buildStatsRow(context),
+                  const SizedBox(height: 30),
+                  _buildQuickActionsTitle(context),
+                  const SizedBox(height: 15),
+                  _buildQuickActions(context),
+                  const SizedBox(height: 30),
+                  _buildRecentOrdersTitle(context),
+                  const SizedBox(height: 15),
+                ],
               ),
             ),
-            Container(
-              width: 20,
-              height: 20,
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Text(
-                  '@',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                _buildRecentOrders(context),
+                const SizedBox(height: 30),
+              ]),
             ),
-            Text(
-              'Zero',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Navigate to support chat
+        },
+        backgroundColor: const Color(0xFF2E5D32),
+        child: const Icon(Icons.support_agent, color: Colors.white),
+      ),
+    );
+  }
+
+  Widget _buildSliverAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 120,
+      floating: true,
+      pinned: true,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back, color: Color(0xFF2E5D32)),
+        onPressed: () {
+          Navigator.pushReplacementNamed(context, Routes.home);
+        },
+      ),
+
+
+      backgroundColor: const Color(0xFFFDFDFD),
+      elevation: 0,
+      flexibleSpace: FlexibleSpaceBar(
         centerTitle: true,
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_outlined),
-            color: Theme.of(context).primaryColor,
+        title: _buildAdminLogo(context),
+        titlePadding: const EdgeInsets.only(bottom: 16),
+      ),
+      actions: [
+        Container(
+          margin: const EdgeInsets.only(right: 16, top: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5D32).withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: IconButton(
+            icon: const Icon(Icons.notifications_none_rounded),
+            color: const Color(0xFF2E5D32),
+            iconSize: 22,
             onPressed: () {},
           ),
-          IconButton(
+        ),
+        Container(
+          margin: const EdgeInsets.only(right: 16, top: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5D32).withOpacity(0.08),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: IconButton(
             icon: const Icon(Icons.logout_outlined),
-            color: Theme.of(context).primaryColor,
+            color: const Color(0xFF2E5D32),
+            iconSize: 22,
             onPressed: () {
               Navigator.pushReplacementNamed(context, Routes.login);
             },
           ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 20),
-            Text(
-              'Admin Dashboard',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Welcome back, Admin',
-              style: GoogleFonts.lato(
-                fontSize: 16,
-                color: Theme.of(context).primaryColor.withOpacity(0.8),
-              ),
-            ),
-            const SizedBox(height: 30),
-            _buildStatsRow(context),
-            const SizedBox(height: 30),
-            _buildQuickActions(context),
-            const SizedBox(height: 30),
-            _buildRecentOrders(context),
-            const SizedBox(height: 30),
-          ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SupportChatScreen(
-                isAdminView: true,
-                customerName: 'Sarah Johnson',
-              ),
-            ),
-          );
-        },
-        backgroundColor: Theme.of(context).primaryColor,
-        child: const Icon(Icons.support_agent, color: Colors.white),
-      ),
+      ],
+    );
+  }
+
+  Widget _buildAdminLogo(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: const BoxDecoration(
+            color: Color(0xFFB6D433),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'source',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 2,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          width: 1,
+          height: 16,
+          color: const Color(0xFF2E5D32).withOpacity(0.3),
+        ),
+        Text(
+          'admin',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWelcomeSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'dashboard',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.6),
+            letterSpacing: 3,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'welcome back',
+          style: GoogleFonts.poppins(
+            fontSize: 28,
+            fontWeight: FontWeight.w200,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: -0.5,
+            height: 1.1,
+          ),
+        ),
+      ],
     );
   }
 
@@ -158,16 +231,15 @@ class AdminDashboardScreen extends StatelessWidget {
 
   Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF2E5D32).withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
@@ -179,9 +251,10 @@ class AdminDashboardScreen extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: GoogleFonts.lato(
-                  color: Colors.grey.shade600,
-                  fontSize: 14,
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w300,
+                  color: const Color(0xFF2E5D32).withOpacity(0.7),
                 ),
               ),
               Container(
@@ -201,10 +274,10 @@ class AdminDashboardScreen extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             value,
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF2E5D32),
             ),
           ),
         ],
@@ -212,47 +285,41 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildQuickActionsTitle(BuildContext context) {
+    return Text(
+      'quick actions',
+      style: GoogleFonts.poppins(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        color: const Color(0xFF2E5D32),
+        letterSpacing: 1,
+      ),
+    );
+  }
+
   Widget _buildQuickActions(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return GridView.count(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      crossAxisCount: 2,
+      childAspectRatio: 1.5,
+      crossAxisSpacing: 15,
+      mainAxisSpacing: 15,
       children: [
-        Text(
-          'Quick Actions',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
-        const SizedBox(height: 15),
-        GridView.count(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          crossAxisCount: 2,
-          childAspectRatio: 1.5,
-          crossAxisSpacing: 15,
-          mainAxisSpacing: 15,
-          children: [
-            _buildActionCard(context, 'Add Product', Icons.add_circle_outline, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProductManagementScreen()),
-              );
-            }),
-            _buildActionCard(context, 'Manage Inventory', Icons.inventory_outlined, () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ProductManagementScreen()),
-              );
-            }),
-            _buildActionCard(context, 'View Reports', Icons.analytics_outlined, () {
-              // Handle reports
-            }),
-            _buildActionCard(context, 'User Management', Icons.people_outline, () {
-              // Handle users
-            }),
-          ],
-        ),
+        _buildActionCard(context, 'Add Product', Icons.add_circle_outline, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ProductManagementScreen()),
+          );
+        }),
+        _buildActionCard(context, 'Manage Inventory', Icons.inventory_outlined, () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ProductManagementScreen()),
+          );
+        }),
+        _buildActionCard(context, 'View Reports', Icons.analytics_outlined, () {}),
+        _buildActionCard(context, 'User Management', Icons.people_outline, () {}),
       ],
     );
   }
@@ -261,37 +328,37 @@ class AdminDashboardScreen extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: const Offset(0, 2),
+            color: const Color(0xFF2E5D32).withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
           ),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(16),
           onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(15),
+            padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   icon,
-                  size: 30,
-                  color: Theme.of(context).primaryColor,
+                  size: 24,
+                  color: const Color(0xFF2E5D32),
                 ),
                 const SizedBox(height: 10),
                 Text(
                   title,
-                  style: GoogleFonts.lato(
-                    fontWeight: FontWeight.bold,
-                    color: Theme.of(context).primaryColor,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF2E5D32),
                   ),
                 ),
               ],
@@ -302,84 +369,85 @@ class AdminDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentOrders(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildRecentOrdersTitle(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Recent Orders',
-              style: GoogleFonts.playfairDisplay(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                // Navigate to all orders
-              },
-              child: Text(
-                'View All',
-                style: GoogleFonts.lato(
-                  color: Theme.of(context).primaryColor,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 15),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                spreadRadius: 1,
-                blurRadius: 5,
-                offset: const Offset(0, 2),
-              ),
-            ],
+        Text(
+          'recent orders',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
           ),
-          child: Column(
-            children: [
-              _buildOrderItem(context, '#12345', 'Completed', '\$45.99'),
-              const Divider(height: 1),
-              _buildOrderItem(context, '#12346', 'Processing', '\$32.50'),
-              const Divider(height: 1),
-              _buildOrderItem(context, '#12347', 'Pending', '\$67.25'),
-              const Divider(height: 1),
-              _buildOrderItem(context, '#12348', 'Cancelled', '\$24.99'),
-            ],
+        ),
+        TextButton(
+          onPressed: () {},
+          style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            minimumSize: Size.zero,
+          ),
+          child: Text(
+            'view all',
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.w300,
+              color: const Color(0xFF2E5D32).withOpacity(0.6),
+              letterSpacing: 1,
+            ),
           ),
         ),
       ],
     );
   }
 
+  Widget _buildRecentOrders(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2E5D32).withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          _buildOrderItem(context, '#12345', 'Completed', '\$45.99'),
+          Divider(height: 1, color: const Color(0xFF2E5D32).withOpacity(0.1)),
+          _buildOrderItem(context, '#12346', 'Processing', '\$32.50'),
+          Divider(height: 1, color: const Color(0xFF2E5D32).withOpacity(0.1)),
+          _buildOrderItem(context, '#12347', 'Pending', '\$67.25'),
+          Divider(height: 1, color: const Color(0xFF2E5D32).withOpacity(0.1)),
+          _buildOrderItem(context, '#12348', 'Cancelled', '\$24.99'),
+        ],
+      ),
+    );
+  }
+
   Widget _buildOrderItem(BuildContext context, String orderId, String status, String amount) {
-    Color statusColor = Colors.grey;
-    if (status == 'Completed') statusColor = Colors.green;
-    if (status == 'Processing') statusColor = Colors.orange;
-    if (status == 'Cancelled') statusColor = Colors.red;
+    Color statusColor = _getStatusColor(status);
 
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       title: Text(
         orderId,
-        style: GoogleFonts.lato(
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).primaryColor,
+        style: GoogleFonts.poppins(
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: const Color(0xFF2E5D32),
         ),
       ),
       subtitle: Text(
         'Yesterday, 3:45 PM',
-        style: GoogleFonts.lato(
-          color: Colors.grey.shade600,
+        style: GoogleFonts.poppins(
+          fontSize: 11,
+          fontWeight: FontWeight.w300,
+          color: const Color(0xFF2E5D32).withOpacity(0.6),
         ),
       ),
       trailing: Column(
@@ -388,9 +456,10 @@ class AdminDashboardScreen extends StatelessWidget {
         children: [
           Text(
             amount,
-            style: GoogleFonts.lato(
-              fontWeight: FontWeight.bold,
-              color: Theme.of(context).primaryColor,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF2E5D32),
             ),
           ),
           const SizedBox(height: 4),
@@ -398,22 +467,35 @@ class AdminDashboardScreen extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
             decoration: BoxDecoration(
               color: statusColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               status,
-              style: GoogleFonts.lato(
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
                 color: statusColor,
-                fontSize: 12,
-                fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ],
       ),
-      onTap: () {
-        // Navigate to order details
-      },
+      onTap: () {},
     );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'processing':
+        return const Color(0xFFFF9800);
+      case 'completed':
+        return const Color(0xFF4CAF50);
+      case 'pending':
+        return const Color(0xFF2196F3);
+      case 'cancelled':
+        return const Color(0xFFF44336);
+      default:
+        return const Color(0xFF2E5D32);
+    }
   }
 }

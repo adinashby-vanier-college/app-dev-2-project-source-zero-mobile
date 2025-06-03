@@ -11,7 +11,6 @@ class WelcomeScreen extends StatelessWidget {
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) {
-          // Use Expanded widget inside a Row to prevent overflow
           return Row(
             children: [
               // Left side - Green Section
@@ -28,12 +27,11 @@ class WelcomeScreen extends StatelessWidget {
                           const SizedBox(height: 40),
                           _buildLogo(context),
                           const SizedBox(height: 40),
-                          // Wrapped in Flexible to prevent text overflow
                           Flexible(
                             child: Text(
                               'ZERO\nWASTED\nTIME,\nAT YOUR\nMOST\nTRUSTED\nSOURCE',
                               style: GoogleFonts.playfairDisplay(
-                                fontSize: 24, // Smaller font for space
+                                fontSize: 24,
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF004D40),
                                 height: 1.2,
@@ -63,8 +61,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   child: Stack(
                     children: [
-                      // Fallback color in case image doesn't load
-                      Container(color: const Color(0xFFF5F5DC)), // Light beige as fallback
+                      Container(color: const Color(0xFFF5F5DC)),
                       _buildProductsDisplay(context),
                     ],
                   ),
@@ -133,7 +130,6 @@ class WelcomeScreen extends StatelessWidget {
         'assets/welcome_background.png',
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          print('Error loading background image: $error');
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -162,10 +158,9 @@ class WelcomeScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // Login Button - Forest Green with rustic feel
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF004D40), // Forest green
+            backgroundColor: const Color(0xFF004D40),
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 60),
             shape: RoundedRectangleBorder(
@@ -192,10 +187,9 @@ class WelcomeScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 16),
-        // Sign up button - Completely white with rustic feel
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white, // Pure white as requested
+            backgroundColor: Colors.white,
             foregroundColor: const Color(0xFF004D40),
             minimumSize: const Size(double.infinity, 60),
             shape: RoundedRectangleBorder(

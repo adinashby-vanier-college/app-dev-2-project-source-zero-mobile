@@ -8,7 +8,7 @@ class SupportChatScreen extends StatefulWidget {
   const SupportChatScreen({
     super.key,
     this.isAdminView = false,
-    this.customerName = 'John Doe'
+    this.customerName = 'John Doe',
   });
 
   @override
@@ -19,7 +19,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
   final List<Map<String, dynamic>> _messages = [
     {'sender': 'customer', 'text': 'Hello, I need help with my order', 'time': '10:30 AM'},
     {'sender': 'support', 'text': 'How can I assist you today?', 'time': '10:32 AM'},
-    {'sender': 'customer', 'text': 'My package hasn\'t arrived', 'time': '10:33 AM'},
+    {'sender': 'customer', 'text': "My package hasn't arrived", 'time': '10:33 AM'},
     {'sender': 'customer', 'text': 'Order #12345', 'time': '10:34 AM'},
   ];
 
@@ -29,35 +29,36 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToBottom();
-    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
   }
 
   void _scrollToBottom() {
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.background,
+      backgroundColor: const Color(0xFFFFF8E7),
       appBar: AppBar(
         title: Text(
           widget.isAdminView ? 'Support Chat' : 'Live Chat Support',
           style: GoogleFonts.playfairDisplay(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Theme.of(context).primaryColor,
+            color: const Color(0xFF2E5D32),
           ),
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
+          color: const Color(0xFF2E5D32),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -70,9 +71,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
               controller: _scrollController,
               padding: const EdgeInsets.all(16),
               itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                return _buildMessageBubble(context, _messages[index]);
-              },
+              itemBuilder: (context, index) => _buildMessageBubble(_messages[index]),
             ),
           ),
           _buildMessageInput(context),
@@ -86,18 +85,13 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         children: [
           CircleAvatar(
-            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
-            child: Icon(
-              Icons.person,
-              color: Theme.of(context).primaryColor,
-            ),
+            backgroundColor: const Color(0xFF2E5D32).withOpacity(0.1),
+            child: const Icon(Icons.person, color: Color(0xFF2E5D32)),
           ),
           const SizedBox(width: 12),
           Column(
@@ -108,7 +102,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                 style: GoogleFonts.lato(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: Theme.of(context).primaryColor,
+                  color: const Color(0xFF2E5D32),
                 ),
               ),
               Text(
@@ -125,10 +119,9 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
     );
   }
 
-  Widget _buildMessageBubble(BuildContext context, Map<String, dynamic> message) {
-    final isCustomerMessage = message['sender'] == 'customer';
-    final showOnLeft = (widget.isAdminView && isCustomerMessage) ||
-        (!widget.isAdminView && !isCustomerMessage);
+  Widget _buildMessageBubble(Map<String, dynamic> message) {
+    final isCustomer = message['sender'] == 'customer';
+    final showOnLeft = (widget.isAdminView && isCustomer) || (!widget.isAdminView && !isCustomer);
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -139,14 +132,9 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
             maxWidth: MediaQuery.of(context).size.width * 0.75,
           ),
           child: Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
-            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: showOnLeft
-                  ? Colors.grey.shade100
-                  : Theme.of(context).primaryColor.withOpacity(0.1),
+              color: showOnLeft ? Colors.white : const Color(0xFF2E5D32).withOpacity(0.1),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Column(
@@ -154,9 +142,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
               children: [
                 Text(
                   message['text'],
-                  style: GoogleFonts.lato(
-                    color: Theme.of(context).primaryColor,
-                  ),
+                  style: GoogleFonts.lato(color: const Color(0xFF2E5D32)),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -179,9 +165,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(
-          top: BorderSide(color: Colors.grey.shade200),
-        ),
+        border: Border(top: BorderSide(color: Colors.grey.shade200)),
       ),
       child: Row(
         children: [
@@ -196,16 +180,13 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
                 ),
                 filled: true,
                 fillColor: Colors.grey.shade100,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
             ),
           ),
           const SizedBox(width: 8),
           CircleAvatar(
-            backgroundColor: Theme.of(context).primaryColor,
+            backgroundColor: const Color(0xFF2E5D32),
             child: IconButton(
               icon: const Icon(Icons.send, color: Colors.white),
               onPressed: () {

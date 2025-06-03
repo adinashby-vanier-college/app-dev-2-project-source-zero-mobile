@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../models/notifications/flutter_local_notifications.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../widgets/bottom_navigation.dart';
+import '../routes.dart';
 
 class NotificationManagerScreen extends StatefulWidget {
   const NotificationManagerScreen({super.key});
@@ -17,97 +19,159 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFDFDFD),
       appBar: AppBar(
-        title: Text('Notification Manager', style: GoogleFonts.playfairDisplay()),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildNotificationControlPanel(context),
-            const SizedBox(height: 20),
-            _buildNotificationDemoSection(context),
-          ],
+        backgroundColor: const Color(0xFFFDFDFD),
+        elevation: 0,
+        title: Text(
+          'Notifications',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF2E5D32),
+          ),
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 20),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
-    );
-  }
-
-  Widget _buildNotificationControlPanel(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            SwitchListTile(
-              title: const Text("Enable Notifications"),
-              value: notificationsEnabled,
-              onChanged: (value) => setState(() {
-                notificationsEnabled = value;
-                _updateStatus(value ? "Notifications enabled" : "Notifications disabled");
-              }),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNotificationDemoSection(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text("Notification Demo", style: GoogleFonts.lato(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            _buildDemoButton(
-              "Test Immediate Notification",
-              Icons.notifications,
-              _testImmediateNotification,
-            ),
-            const SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: _buildDemoButton(
-                    "Schedule Notification",
-                    Icons.timer,
-                    _testScheduledNotification,
-                  ),
-                ),
-                const SizedBox(width: 10),
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: () => _adjustScheduleTime(-5),
-                ),
-                Text("$_secondsToSchedule s"),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => _adjustScheduleTime(5),
-                ),
-              ],
-            ),
-            const SizedBox(height: 10),
-            _buildDemoButton(
-              "Cancel All Notifications",
-              Icons.notifications_off,
-              _cancelAllNotifications,
-              isDestructive: true,
-            ),
-            const SizedBox(height: 15),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
+              child: Column(
+                children: [
+                  _buildNotificationToggle(),
+                  const SizedBox(height: 30),
+                  _buildNotificationDemoSection(),
+                ],
               ),
-              child: Text(_lastNotificationStatus),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationToggle() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2E5D32).withOpacity(0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(FontAwesomeIcons.bell, size: 20, color: Color(0xFFB6D433)),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Text(
+              'Enable Notifications',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF2E5D32),
+              ),
+            ),
+          ),
+          Switch(
+            value: notificationsEnabled,
+            activeColor: const Color(0xFFB6D433),
+            onChanged: (value) => setState(() {
+              notificationsEnabled = value;
+              _updateStatus(value ? "Notifications enabled" : "Notifications disabled");
+            }),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationDemoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Test Notifications',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: const Color(0xFF2E5D32),
+          ),
+        ),
+        const SizedBox(height: 16),
+        _buildDemoButton(
+          "Test Immediate Notification",
+          FontAwesomeIcons.bolt,
+          _testImmediateNotification,
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildDemoButton(
+                "Schedule Notification",
+                FontAwesomeIcons.clock,
+                _testScheduledNotification,
+              ),
+            ),
+            const SizedBox(width: 12),
+            IconButton(
+              icon: const Icon(Icons.remove, size: 20),
+              onPressed: () => _adjustScheduleTime(-5),
+            ),
+            Text(
+              '$_secondsToSchedule s',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: const Color(0xFF2E5D32),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.add, size: 20),
+              onPressed: () => _adjustScheduleTime(5),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 12),
+        _buildDemoButton(
+          "Cancel All Notifications",
+          FontAwesomeIcons.times,
+          _cancelAllNotifications,
+          isDestructive: true,
+        ),
+        const SizedBox(height: 20),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5D32).withOpacity(0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Text(
+            _lastNotificationStatus,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: const Color(0xFF2E5D32).withOpacity(0.8),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -117,14 +181,34 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
       VoidCallback onPressed, {
         bool isDestructive = false,
       }) {
-    return ElevatedButton.icon(
-      icon: Icon(icon),
-      label: Text(text),
+    return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        foregroundColor: isDestructive ? Colors.red : Theme.of(context).primaryColor,
-        backgroundColor: isDestructive ? Colors.red[50] : Colors.white,
+        backgroundColor: isDestructive ? Colors.white : const Color(0xFFF5F9F0),
+        foregroundColor: isDestructive ? Colors.red : const Color(0xFF2E5D32),
+        minimumSize: const Size(double.infinity, 52),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: isDestructive ? Colors.red.withOpacity(0.3) : const Color(0xFFB6D433).withOpacity(0.3),
+          ),
+        ),
+        elevation: 0,
       ),
       onPressed: onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 16),
+          const SizedBox(width: 8),
+          Text(
+            text,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -138,11 +222,11 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
     if (!notificationsEnabled) return;
 
     try {
-      await NotificationService.showNotification(
-        id: 1,
-        title: 'Immediate Notification',
-        body: 'This appeared immediately!',
-      );
+      // await NotificationService.showNotification(
+      //   id: 1,
+      //   title: 'Immediate Notification',
+      //   body: 'This appeared immediately!',
+      // );
       _updateStatus("Immediate notification sent!");
     } catch (e) {
       _updateStatus("Error: $e");
@@ -153,12 +237,12 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
     if (!notificationsEnabled) return;
 
     try {
-      await NotificationService.scheduleNotification(
-        id: 2,
-        title: 'Scheduled Notification',
-        body: 'Scheduled $_secondsToSchedule seconds ago',
-        duration: Duration(seconds: _secondsToSchedule),
-      );
+      // await NotificationService.scheduleNotification(
+      //   id: 2,
+      //   title: 'Scheduled Notification',
+      //   body: 'Scheduled $_secondsToSchedule seconds ago',
+      //   duration: Duration(seconds: _secondsToSchedule),
+      // );
       _updateStatus("Scheduled for $_secondsToSchedule seconds");
     } catch (e) {
       _updateStatus("Error: $e");
@@ -167,7 +251,7 @@ class _NotificationManagerScreenState extends State<NotificationManagerScreen> {
 
   Future<void> _cancelAllNotifications() async {
     try {
-      await NotificationService.cancelAllNotifications();
+      // await NotificationService.cancelAllNotifications();
       _updateStatus("All notifications cancelled");
     } catch (e) {
       _updateStatus("Error: $e");
