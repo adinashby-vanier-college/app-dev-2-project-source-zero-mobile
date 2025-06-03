@@ -145,7 +145,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'John Doe',
+                  'Laganja Estranja',
                   style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -153,7 +153,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 Text(
-                  'john.doe@example.com',
+                  'deathdropgoddess@shdb.com',
                   style: GoogleFonts.poppins(
                     fontSize: 12,
                     fontWeight: FontWeight.w300,
@@ -226,8 +226,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             context,
             FontAwesomeIcons.circleQuestion,
             'Help & Support',
-                () {},
+                () => Navigator.pushNamed(
+              context,
+              Routes.customerService,
+            ),
           ),
+
           const Divider(height: 24, color: Color(0xFFF1F1F1)),
           _buildLogoutButton(context),
         ],

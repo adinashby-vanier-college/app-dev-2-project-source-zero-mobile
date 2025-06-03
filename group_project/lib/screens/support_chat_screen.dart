@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../widgets/bottom_navigation.dart';
 
 class SupportChatScreen extends StatefulWidget {
   final bool isAdminView;
@@ -8,7 +10,7 @@ class SupportChatScreen extends StatefulWidget {
   const SupportChatScreen({
     super.key,
     this.isAdminView = false,
-    this.customerName = 'John Doe',
+    this.customerName = 'Customer',
   });
 
   @override
@@ -45,53 +47,161 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFFF8E7),
-      appBar: AppBar(
-        title: Text(
-          widget.isAdminView ? 'Support Chat' : 'Live Chat Support',
-          style: GoogleFonts.playfairDisplay(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF2E5D32),
-          ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-          color: const Color(0xFF2E5D32),
-        ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-      body: Column(
-        children: [
-          if (widget.isAdminView) _buildCustomerHeader(context),
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) => _buildMessageBubble(_messages[index]),
+      backgroundColor: const Color(0xFFFDFDFD),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 120,
+            floating: true,
+            pinned: true,
+            backgroundColor: const Color(0xFFFDFDFD),
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              centerTitle: true,
+              title: _buildMinimalLogo(context),
+              titlePadding: const EdgeInsets.only(bottom: 16),
+            ),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Color(0xFF2E5D32)),
+              onPressed: () => Navigator.pop(context),
             ),
           ),
-          _buildMessageInput(context),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 10),
+                  _buildHeaderSection(context),
+                  if (widget.isAdminView) _buildCustomerHeader(context),
+                ],
+              ),
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF2E5D32).withOpacity(0.06),
+                        blurRadius: 16,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: _messages.length,
+                          itemBuilder: (context, index) => _buildMessageBubble(_messages[index]),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      _buildMessageInput(context),
+                    ],
+                  ),
+                ),
+              ]),
+            ),
+          ),
         ],
       ),
+      bottomNavigationBar: const SourceZeroBottomNavigationBar(currentIndex: 1),
+    );
+  }
+
+  Widget _buildMinimalLogo(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: const BoxDecoration(
+            color: Color(0xFFB6D433),
+            shape: BoxShape.circle,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Text(
+          'source',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 2,
+          ),
+        ),
+        Container(
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          width: 1,
+          height: 16,
+          color: const Color(0xFF2E5D32).withOpacity(0.3),
+        ),
+        Text(
+          'zero',
+          style: GoogleFonts.poppins(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildHeaderSection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'your',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.6),
+            letterSpacing: 3,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          'support chat',
+          style: GoogleFonts.poppins(
+            fontSize: 28,
+            fontWeight: FontWeight.w200,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: -0.5,
+            height: 1.1,
+          ),
+        ),
+      ],
     );
   }
 
   Widget _buildCustomerHeader(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(bottom: BorderSide(color: Colors.grey.shade200)),
-      ),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Row(
         children: [
-          CircleAvatar(
-            backgroundColor: const Color(0xFF2E5D32).withOpacity(0.1),
-            child: const Icon(Icons.person, color: Color(0xFF2E5D32)),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: const Color(0xFFB6D433).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(FontAwesomeIcons.user, color: Color(0xFF2E5D32), size: 20),
           ),
           const SizedBox(width: 12),
           Column(
@@ -99,16 +209,16 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
             children: [
               Text(
                 widget.customerName ?? 'Customer',
-                style: GoogleFonts.lato(
-                  fontWeight: FontWeight.bold,
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.w500,
                   fontSize: 16,
                   color: const Color(0xFF2E5D32),
                 ),
               ),
               Text(
                 'Active now',
-                style: GoogleFonts.lato(
-                  color: Colors.green,
+                style: GoogleFonts.poppins(
+                  color: const Color(0xFFB6D433),
                   fontSize: 12,
                 ),
               ),
@@ -124,7 +234,7 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
     final showOnLeft = (widget.isAdminView && isCustomer) || (!widget.isAdminView && !isCustomer);
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Align(
         alignment: showOnLeft ? Alignment.centerLeft : Alignment.centerRight,
         child: ConstrainedBox(
@@ -134,21 +244,26 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: showOnLeft ? Colors.white : const Color(0xFF2E5D32).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(16),
+              color: showOnLeft ? const Color(0xFFF8F9FA) : const Color(0xFFB6D433).withOpacity(0.2),
+              borderRadius: BorderRadius.only(
+                topLeft: const Radius.circular(16),
+                topRight: const Radius.circular(16),
+                bottomLeft: showOnLeft ? const Radius.circular(0) : const Radius.circular(16),
+                bottomRight: showOnLeft ? const Radius.circular(16) : const Radius.circular(0),
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   message['text'],
-                  style: GoogleFonts.lato(color: const Color(0xFF2E5D32)),
+                  style: GoogleFonts.poppins(color: const Color(0xFF2E5D32)),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   message['time'],
-                  style: GoogleFonts.lato(
-                    color: Colors.grey.shade600,
+                  style: GoogleFonts.poppins(
+                    color: const Color(0xFF2E5D32).withOpacity(0.6),
                     fontSize: 10,
                   ),
                 ),
@@ -162,10 +277,10 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
 
   Widget _buildMessageInput(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: const Color(0xFFF8F9FA),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
@@ -174,21 +289,30 @@ class _SupportChatScreenState extends State<SupportChatScreen> {
               controller: _messageController,
               decoration: InputDecoration(
                 hintText: 'Type your message...',
+                hintStyle: GoogleFonts.poppins(
+                  color: const Color(0xFF2E5D32).withOpacity(0.4),
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(24),
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: Colors.white,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               ),
+              style: GoogleFonts.poppins(color: const Color(0xFF2E5D32)),
             ),
           ),
           const SizedBox(width: 8),
-          CircleAvatar(
-            backgroundColor: const Color(0xFF2E5D32),
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: const Color(0xFFB6D433),
+              borderRadius: BorderRadius.circular(12),
+            ),
             child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.white),
+              icon: const Icon(Icons.send, color: Colors.white, size: 20),
               onPressed: () {
                 if (_messageController.text.trim().isNotEmpty) {
                   setState(() {

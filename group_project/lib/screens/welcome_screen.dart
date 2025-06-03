@@ -9,39 +9,29 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFFDFDFD),
       body: LayoutBuilder(
         builder: (context, constraints) {
           return Row(
             children: [
-              // Left side - Green Section
+              // Left side - Clean White Section
               Expanded(
                 flex: 1,
                 child: Container(
-                  color: const Color(0xFFB6D433),
+                  color: const Color(0xFFFDFDFD),
                   child: SafeArea(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 40),
-                          _buildLogo(context),
-                          const SizedBox(height: 40),
-                          Flexible(
-                            child: Text(
-                              'ZERO\nWASTED\nTIME,\nAT YOUR\nMOST\nTRUSTED\nSOURCE',
-                              style: GoogleFonts.playfairDisplay(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF004D40),
-                                height: 1.2,
-                              ),
-                              overflow: TextOverflow.visible,
-                            ),
-                          ),
+                          const SizedBox(height: 60),
+                          _buildModernLogo(context),
+                          const SizedBox(height: 80),
+                          _buildWelcomeText(context),
                           const Spacer(),
-                          _buildAuthButtons(context),
-                          const SizedBox(height: 40),
+                          _buildModernAuthButtons(context),
+                          const SizedBox(height: 30),
                         ],
                       ),
                     ),
@@ -49,7 +39,7 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
 
-              // Right side - Background Image
+              // Right side - Background Image with Overlay
               Expanded(
                 flex: 1,
                 child: Container(
@@ -61,7 +51,19 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   child: Stack(
                     children: [
-                      Container(color: const Color(0xFFF5F5DC)),
+                      // Subtle overlay to match the clean aesthetic
+                      Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            colors: [
+                              const Color(0xFFFDFDFD).withOpacity(0.1),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
                       _buildProductsDisplay(context),
                     ],
                   ),
@@ -74,53 +76,87 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLogo(BuildContext context) {
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.centerLeft,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            'Source',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF004D40),
+  Widget _buildModernLogo(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: const BoxDecoration(
+                color: Color(0xFFB6D433),
+                shape: BoxShape.circle,
+              ),
             ),
-          ),
-          const SizedBox(width: 6),
-          Image.asset(
-            'assets/logo.png',
-            height: 40,
-            width: 40,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: 40,
-                width: 40,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF004D40),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  FontAwesomeIcons.leaf,
-                  color: Colors.white,
-                  size: 20,
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 6),
-          Text(
-            'Zero',
-            style: GoogleFonts.playfairDisplay(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF004D40),
+            const SizedBox(width: 12),
+            Text(
+              'source',
+              style: GoogleFonts.poppins(
+                fontSize: 32,
+                fontWeight: FontWeight.w300,
+                color: const Color(0xFF2E5D32),
+                letterSpacing: 2,
+              ),
             ),
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 8),
+              width: 1,
+              height: 24,
+              color: const Color(0xFF2E5D32).withOpacity(0.3),
+            ),
+            Text(
+              'zero',
+              style: GoogleFonts.poppins(
+                fontSize: 32,
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2E5D32),
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Zero waste time at your most trusted source.',
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.6),
+            letterSpacing: 0.5,
           ),
-        ],
-      ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWelcomeText(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'welcome to',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF2E5D32).withOpacity(0.6),
+            letterSpacing: 3,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'mindful\nshopping',
+          style: GoogleFonts.poppins(
+            fontSize: 36,
+            fontWeight: FontWeight.w200,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: -0.5,
+            height: 1.1,
+          ),
+        ),
+      ],
     );
   }
 
@@ -130,88 +166,132 @@ class WelcomeScreen extends StatelessWidget {
         'assets/welcome_background.png',
         fit: BoxFit.cover,
         errorBuilder: (context, error, stackTrace) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                FontAwesomeIcons.image,
-                size: 40,
-                color: Colors.grey[700],
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Natural products coming soon...',
-                style: GoogleFonts.lato(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.grey[800],
+          return Container(
+            margin: const EdgeInsets.all(40),
+            padding: const EdgeInsets.all(40),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.9),
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF2E5D32).withOpacity(0.1),
+                  blurRadius: 20,
+                  offset: const Offset(0, 10),
                 ),
-              ),
-            ],
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFB6D433).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Icon(
+                    FontAwesomeIcons.leaf,
+                    size: 32,
+                    color: Color(0xFF2E5D32),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  'organic products\ncoming soon',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: const Color(0xFF2E5D32),
+                    letterSpacing: 0.5,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
           );
         },
       ),
     );
   }
 
-  Widget _buildAuthButtons(BuildContext context) {
+  Widget _buildModernAuthButtons(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF004D40),
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 60),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(
-                color: Colors.white.withOpacity(0.7),
-                width: 1,
+        Container(
+          height: 56,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5D32).withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
               ),
-            ),
-            elevation: 5,
-            shadowColor: Colors.black.withOpacity(0.4),
-            padding: const EdgeInsets.symmetric(vertical: 18),
+            ],
           ),
-          onPressed: () {
-            Navigator.pushNamed(context, Routes.login);
-          },
-          child: Text(
-            'LOG IN',
-            style: GoogleFonts.lato(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2.0,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2E5D32),
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, Routes.login);
+            },
+            child: Text(
+              'log in',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w400,
+                letterSpacing: 1,
+              ),
             ),
           ),
         ),
         const SizedBox(height: 16),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: const Color(0xFF004D40),
-            minimumSize: const Size(double.infinity, 60),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-              side: BorderSide(
-                color: const Color(0xFF004D40).withOpacity(0.8),
-                width: 1,
+        Container(
+          height: 56,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5D32).withOpacity(0.08),
+                blurRadius: 16,
+                offset: const Offset(0, 6),
               ),
-            ),
-            elevation: 4,
-            shadowColor: const Color(0xFF004D40).withOpacity(0.2),
-            padding: const EdgeInsets.symmetric(vertical: 18),
+            ],
           ),
-          onPressed: () {
-            Navigator.pushNamed(context, Routes.signup);
-          },
-          child: Text(
-            'BEGIN YOUR JOURNEY',
-            style: GoogleFonts.lato(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2.0,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: const Color(0xFF2E5D32),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(
+                  color: const Color(0xFF2E5D32).withOpacity(0.1),
+                  width: 1,
+                ),
+              ),
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+            onPressed: () {
+              Navigator.pushNamed(context, Routes.signup);
+            },
+            child: Text(
+              'begin your journey',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w300,
+                letterSpacing: 1,
+              ),
             ),
           ),
         ),

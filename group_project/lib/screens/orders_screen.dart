@@ -185,9 +185,12 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
       child: TabBar(
         controller: _tabController,
         indicator: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(24),
           color: const Color(0xFFB6D433),
         ),
+        indicatorSize: TabBarIndicatorSize.label, // ✅ This ensures the indicator covers the label container
+        labelPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // ✅ Widen the label area
+
         labelColor: Colors.white,
         unselectedLabelColor: const Color(0xFF2E5D32).withOpacity(0.5),
         labelStyle: GoogleFonts.poppins(
@@ -200,7 +203,8 @@ class _OrdersScreenState extends State<OrdersScreen> with TickerProviderStateMix
           fontWeight: FontWeight.w400,
           letterSpacing: 0.5,
         ),
-        indicatorPadding: const EdgeInsets.all(4),
+        padding: EdgeInsets.zero,
+        indicatorPadding: EdgeInsets.zero,
         tabs: const [
           Tab(text: 'active'),
           Tab(text: 'completed'),

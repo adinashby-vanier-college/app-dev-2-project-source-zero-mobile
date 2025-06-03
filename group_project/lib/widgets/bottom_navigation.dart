@@ -73,9 +73,10 @@ class SourceZeroBottomNavigationBar extends StatelessWidget {
             label: 'Profile',
           ),
           BottomNavigationBarItem(
-            icon: Icon(FontAwesomeIcons.gaugeHigh),
+            icon: Icon(FontAwesomeIcons.userShield), // changed from gaugeHigh
             label: 'Admin',
           ),
+
         ],
       ),
     );

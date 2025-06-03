@@ -30,8 +30,6 @@ class Routes {
   static const supportChat = '/support_chat';
   static const deliveryAddress = '/delivery_address';
   static const notificationManager = '/notification-manager';
-
-  // Admin
   static const adminDashboard = '/admin_dashboard';
 }
 
@@ -40,32 +38,48 @@ class RouteGenerator {
     switch (settings.name) {
       case Routes.welcome:
         return MaterialPageRoute(builder: (_) => const WelcomeScreen());
+
       case Routes.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());
+
       case Routes.signup:
         return MaterialPageRoute(builder: (_) => const SignUpScreen());
+
       case Routes.home:
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+
       case Routes.products:
         return MaterialPageRoute(builder: (_) => const ProductsScreen());
+
       case Routes.productDetail:
         return MaterialPageRoute(builder: (_) => const ProductDetailScreen());
+
       case Routes.orders:
         return MaterialPageRoute(builder: (_) => const OrdersScreen());
+
       case Routes.settings:
         return MaterialPageRoute(builder: (_) => const SettingsScreen());
+
       case Routes.customerService:
         return MaterialPageRoute(builder: (_) => const CustomerServiceScreen());
+
       case Routes.subscriptions:
         return MaterialPageRoute(builder: (_) => const SubscriptionsScreen());
+
       case Routes.supportChat:
-        return MaterialPageRoute(builder: (_) => const SupportChatScreen());
-      case Routes.adminDashboard:
-        return MaterialPageRoute(builder: (_) => const AdminDashboardScreen());
+        return MaterialPageRoute(
+          builder: (_) => const SupportChatScreen(isAdminView: false),
+        );
+
       case Routes.deliveryAddress:
         return MaterialPageRoute(builder: (_) => const DeliveryAddressScreen());
+
       case Routes.notificationManager:
         return MaterialPageRoute(builder: (_) => const NotificationManagerScreen());
+
+      case Routes.adminDashboard:
+        return MaterialPageRoute(builder: (_) => const AdminDashboardScreen());
+
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

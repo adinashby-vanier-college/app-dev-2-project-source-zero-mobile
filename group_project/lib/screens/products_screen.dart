@@ -24,19 +24,17 @@ class ProductsScreen extends StatelessWidget {
                   _buildWelcomeSection(context),
                   const SizedBox(height: 35),
                   _buildSearchBar(context),
-                  const SizedBox(height: 25),
-                  _buildCategoriesRow(context),
-                  const SizedBox(height: 30),
-                  _buildProductGrid(context),
                   const SizedBox(height: 40),
-                  _buildArtisticOfferCard(context),
+                  _buildCategoriesSection(context),
+                  const SizedBox(height: 45),
+                  _buildProductsGrid(context),
                 ],
               ),
             ),
           ),
         ],
       ),
-      bottomNavigationBar: const SourceZeroBottomNavigationBar(currentIndex: 2),
+      bottomNavigationBar: const SourceZeroBottomNavigationBar(currentIndex: 1),
     );
   }
 
@@ -123,7 +121,7 @@ class ProductsScreen extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'our products',
+          'our collection',
           style: GoogleFonts.poppins(
             fontSize: 14,
             fontWeight: FontWeight.w300,
@@ -133,7 +131,7 @@ class ProductsScreen extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          'mindful selection',
+          'organic selection',
           style: GoogleFonts.poppins(
             fontSize: 28,
             fontWeight: FontWeight.w200,
@@ -188,7 +186,7 @@ class ProductsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCategoriesRow(BuildContext context) {
+  Widget _buildCategoriesSection(BuildContext context) {
     final categories = [
       {'name': 'all', 'icon': FontAwesomeIcons.layerGroup},
       {'name': 'food', 'icon': FontAwesomeIcons.leaf},
@@ -196,226 +194,217 @@ class ProductsScreen extends StatelessWidget {
       {'name': 'wellness', 'icon': FontAwesomeIcons.spa},
     ];
 
-    return SizedBox(
-      height: 50,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: categories.map((category) =>
-            _buildCategoryChip(context, category['name'] as String, category['icon'] as IconData)
-        ).toList(),
-      ),
-    );
-  }
-
-  Widget _buildCategoryChip(BuildContext context, String label, IconData icon) {
-    return Container(
-      margin: const EdgeInsets.only(right: 10),
-      child: ChoiceChip(
-        label: Row(
-          children: [
-            Icon(icon, size: 16, color: const Color(0xFF2E5D32)),
-            const SizedBox(width: 6),
-            Text(label),
-          ],
-        ),
-        selected: label == 'all',
-        selectedColor: const Color(0xFFB6D433).withOpacity(0.2),
-        backgroundColor: Colors.white,
-        labelStyle: GoogleFonts.poppins(
-          fontSize: 12,
-          fontWeight: FontWeight.w400,
-          color: const Color(0xFF2E5D32),
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: BorderSide(
-            color: const Color(0xFF2E5D32).withOpacity(0.1),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'categories',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
           ),
         ),
-        onSelected: (bool selected) {},
-      ),
-    );
-  }
-
-  Widget _buildProductGrid(BuildContext context) {
-    return GridView.count(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      crossAxisCount: 2,
-      childAspectRatio: 0.75,
-      crossAxisSpacing: 15,
-      mainAxisSpacing: 15,
-      children: [
-        _buildArtisticProductCard(context, 'organic treats', '5.99', 'assets/treats.png'),
-        _buildArtisticProductCard(context, 'cold pressed oil', '12.99', 'assets/oliveoil.png'),
-        _buildArtisticProductCard(context, 'wellness bundle', '29.99', 'assets/blueprint.png'),
-        _buildArtisticProductCard(context, 'nut milk', '12.99', 'assets/macademia.jpg'),
-        _buildArtisticProductCard(context, 'allulose', '11.99', 'assets/allulose.webp'),
-        _buildArtisticProductCard(context, 'almond butter', '9.49', 'assets/almondbutter.webp'),
+        const SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: categories.map((category) =>
+              _buildMinimalCategoryCard(context, category['name'] as String, category['icon'] as IconData)
+          ).toList(),
+        ),
       ],
     );
   }
 
-  Widget _buildArtisticProductCard(BuildContext context, String name, String price, String imagePath) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF2E5D32).withOpacity(0.06),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 3,
-            child: Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                color: const Color(0xFFF8F9FA),
+  Widget _buildMinimalCategoryCard(BuildContext context, String title, IconData icon) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: () {
+          // Handle category selection
+        },
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 4),
+          height: 80,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF2E5D32).withOpacity(0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 6),
               ),
-              child: ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: const Color(0xFFB6D433).withOpacity(0.1),
-                      child: const Icon(
-                        FontAwesomeIcons.image,
-                        color: Color(0xFF2E5D32),
-                        size: 32,
-                      ),
-                    );
-                  },
+            ],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                color: const Color(0xFFB6D433),
+                size: 20,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                title,
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w400,
+                  color: const Color(0xFF2E5D32),
+                  letterSpacing: 0.5,
                 ),
               ),
-            ),
+            ],
           ),
-          Expanded(
-            flex: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w400,
-                      color: const Color(0xFF2E5D32),
-                      letterSpacing: 0.3,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const Spacer(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '\$$price',
-                        style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF2E5D32),
-                        ),
-                      ),
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFB6D433),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Icon(
-                          Icons.add_rounded,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildArtisticOfferCard(BuildContext context) {
-    return Container(
-      height: 120,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFFB6D433).withOpacity(0.15),
-            const Color(0xFF2E5D32).withOpacity(0.05),
+  Widget _buildProductsGrid(BuildContext context) {
+    final products = [
+      {'name': 'organic treats', 'price': '5.99', 'image': 'assets/treats.png'},
+      {'name': 'cold pressed oil', 'price': '12.99', 'image': 'assets/oliveoil.png'},
+      {'name': 'wellness bundle', 'price': '29.99', 'image': 'assets/blueprint.png'},
+      {'name': 'nut milk', 'price': '12.99', 'image': 'assets/macademia.jpg'},
+      {'name': 'allulose', 'price': '11.99', 'image': 'assets/allulose.webp'},
+      {'name': 'almond butter', 'price': '9.49', 'image': 'assets/almondbutter.webp'},
+      {'name': 'coconut sugar', 'price': '7.99', 'image': 'assets/coconut_sugar.jpg'},
+      {'name': 'chia seeds', 'price': '8.49', 'image': 'assets/chia_seeds.jpg'},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'all products',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+            color: const Color(0xFF2E5D32),
+            letterSpacing: 1,
+          ),
+        ),
+        const SizedBox(height: 20),
+        GridView.count(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          crossAxisCount: 2,
+          childAspectRatio: 0.75,
+          crossAxisSpacing: 15,
+          mainAxisSpacing: 15,
+          children: products.map((product) =>
+              _buildProductCard(
+                  context,
+                  product['name'] as String,
+                  product['price'] as String,
+                  product['image'] as String
+              )
+          ).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProductCard(BuildContext context, String name, String price, String imagePath) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.pushNamed(context, Routes.productDetail);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF2E5D32).withOpacity(0.06),
+              blurRadius: 16,
+              offset: const Offset(0, 8),
+            ),
           ],
         ),
-        border: Border.all(
-          color: const Color(0xFFB6D433).withOpacity(0.2),
-          width: 1,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  color: const Color(0xFFF8F9FA),
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        color: const Color(0xFFB6D433).withOpacity(0.1),
+                        child: const Icon(
+                          FontAwesomeIcons.image,
+                          color: Color(0xFF2E5D32),
+                          size: 32,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: const Color(0xFF2E5D32),
+                        letterSpacing: 0.3,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '\$$price',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: const Color(0xFF2E5D32),
+                          ),
+                        ),
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFB6D433),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.add_rounded,
+                            color: Colors.white,
+                            size: 16,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: const Color(0xFFB6D433).withOpacity(0.2),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(
-              FontAwesomeIcons.percent,
-              color: Color(0xFF2E5D32),
-              size: 20,
-            ),
-          ),
-          const SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'first time here?',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xFF2E5D32),
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'enjoy 20% off your first order',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w300,
-                    color: const Color(0xFF2E5D32).withOpacity(0.7),
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
